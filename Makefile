@@ -1,6 +1,7 @@
 #Makefile for pcs
 
 CC=gcc
+FC=gfortran
 
 root_dir=$(shell pwd)
 cpfloat_dir=${root_dir}/external/cpfloat
@@ -9,12 +10,19 @@ CLIBS=-lm -lcpfloat -lpcg_random
 CFLAGS=-Wall -Wextra -pedantic -march=native -std=gnu99
 
 
-src/pcs: 
-	${CC} ${CFLAGS} ${cpfloat_paths} src/pcs.c src/pcs.h -o src/pcs ${CLIBS}
+src/example: src/libpcs.a src/libpcs.so
+	${CC} ${CFLAGS} ${cpfloat_paths} -Lsrc src/example.c -o src/example -lpcs ${CLIBS}
 
+src/pcs.o: src/pcs.c src/pcs.h 
+	${CC} ${CFLAGS} ${cpfloat_paths} -c src/pcs.c -o src/pcs.o ${CLIBS}
 
+src/libpcs.so: src/pcs.o
+	$(CC) -shared -o $@ $<
 
-cpfloat: 
+src/libpcs.a: src/pcs.o
+	ar -cr $@ $< 
+
+cpfloat: ${cpfloat_dir}/build/include/cpfloat.h
 	cd ${cpfloat_dir} && make lib && cd ${root_dir}
 
 
