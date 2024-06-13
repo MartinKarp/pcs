@@ -3,39 +3,95 @@
 //#include "cpfloat.h"
 //#include "pcg.h"
 
-#define N 100
+#define N 10
 
 int main () {
   // Allocate the data structure for target formats and rounding parameters.
-  pcs_struct *opts = init_pcs_struct();
-  optstruct *fpopts = opts->fpopts;
-  opts->oper = PCS_UNIFORM_NOISE;
-  opts->arbitrary_amp = 0.5;
+  pcs_struct *opts = init_pcs_struct(); //Explicit allocation necessary in c
 
-  // Set up the parameters for binary16 target format.
-  fpopts->precision = 11;                 // Bits in the significand + 1.
-  fpopts->emax = 15;                      // The maximum exponent value.
-  fpopts->subnormal = CPFLOAT_SUBN_USE;   // Support for subnormals is on.
-  fpopts->round = CPFLOAT_RND_TP;         // Round toward +infinity.
-  fpopts->flip = CPFLOAT_SOFTERR_FP;      // Bit flips are off.
-  fpopts->p = 0;                          // Bit flip probability (not used).
-  fpopts->explim = CPFLOAT_EXPRANGE_TARG; // Limited exponent in target format.
-
-  // Validate the parameters in fpopts.
+  double * test = malloc(sizeof(double)*N);
+  double * testout = malloc(sizeof(double)*N);
+  for (size_t i = 0; i<N; i++) {
+      double j = (double)i + 1.0;
+      test[i] = (j*0.2)*(j*0.2) +j*1.32;
+  }
+  double maxdif = 0.0;
+  double maxreldif = 0.0;
+  // Validate the parameters in opts.
+  opts->oper = PCS_ARBITRARY_ROUND;
+  opts->arbitrary_amp = 0.1;
   int retval = validate_pcs_struct(opts);
   printf("The validation function returned %d.\n", retval);
+  printf("Round to arbitrary fixxed precision");
+  printf("Round to closest %.15e Max dif < %.15e \n", opts->arbitrary_amp, opts->arbitrary_amp/2.0);
 
-  // Initialize C array with arbitrary elements.
-  double X[N] = { (double)5/3, M_PI, M_E, 4,5,6,7,8,9,10 };
-  double Y[N] = { 1.5, 1.5, 1.5 };
-  double Z[N];
-  printf("X in binary64:\n  %.15e %.15e %.15e\n", X[0], X[1], X[2]);
+  retval = pcs(testout, test, N, opts);
 
-  // Round the values of X to the binary16 format and store in Z.
-  pcs(Z, X, N, opts);
   for (size_t i = 0; i< N; i++){
-      printf("X: %.15e Rounded X: %.15e Reldif: %.15e absdif: %.15e \n", X[i], Z[i], (Z[i])/X[i], (Z[i]-X[i]));
+      printf("In: %.15e Out: %.15e\n", test[i], testout[i]);
+      maxdif = fmax(fabs(test[i]-testout[i]),maxdif);
+      maxreldif = fmax(fabs((test[i]-testout[i])/test[i]),maxreldif);
   }
-  free_optstruct(fpopts);
-}
+  printf("Maxdif: %.15e Maxreldif: %.15e\n",maxdif, maxreldif);
+  opts->oper = PCS_CPFLOAT;
+  opts->fpopts->precision = 11;
+  opts->fpopts->emax = 15;
+  opts->fpopts->emin = -14;
+  opts->fpopts->round = CPFLOAT_RND_NE;
+  retval = validate_pcs_struct(opts);
+  printf("The validation function returned %d.\n", retval);
+  printf("Round to nearest, FP16 with CPFloat\n");
+  printf("Max rel dif < %.15e \n", pow(2.0,-1.0*opts->fpopts->precision));
 
+  retval = pcs(testout, test, N, opts);
+  maxdif = 0.0;
+  maxreldif = 0.0;
+
+  for (size_t i = 0; i< N; i++){
+      printf("In: %.15e Out: %.15e\n", test[i], testout[i]);
+      maxdif = fmax(fabs(test[i]-testout[i]),maxdif);
+      maxreldif = fmax(fabs((test[i]-testout[i])/test[i]),maxreldif);
+  }
+  printf("Maxdif: %.15e Maxreldif: %.15e\n",maxdif, maxreldif);
+  opts->oper = PCS_CPFLOAT;
+  opts->fpopts->precision = 11;
+  opts->fpopts->emax = 15;
+  opts->fpopts->emin = -14;
+  opts->fpopts->round = CPFLOAT_RND_SP;
+  retval = validate_pcs_struct(opts);
+  printf("The validation function returned %d.\n", retval);
+  printf("Propoprtional stochastic rounding, FP16 with CPFloat\n");
+  printf("Max rel dif(for round to nearest)  < %.15e \n", pow(2.0,-1.0*opts->fpopts->precision));
+
+  retval = pcs(testout, test, N, opts);
+  maxdif = 0.0;
+  maxreldif = 0.0;
+
+  for (size_t i = 0; i< N; i++){
+      printf("In: %.15e Out: %.15e\n", test[i], testout[i]);
+      maxdif = fmax(fabs(test[i]-testout[i]),maxdif);
+      maxreldif = fmax(fabs((test[i]-testout[i])/test[i]),maxreldif);
+  }
+  printf("Maxdif: %.15e Maxreldif: %.15e\n",maxdif, maxreldif);
+
+  //Uniform noise
+  opts->oper = PCS_UNIFORM_NOISE;
+  opts->arbitrary_amp = 0.1;
+
+  pcg64_srandom(4, 1);
+
+  printf("Add uniform noise, in interval x*[1-r,1+r] r in U(-0.05,0.05)\n");
+  printf("Max rel dif < %.15e \n", opts->arbitrary_amp/2.0);
+
+  retval = pcs(testout, test, N, opts);
+  maxdif = 0.0;
+  maxreldif = 0.0;
+
+  for (size_t i = 0; i< N; i++){
+      printf("In: %.15e Out: %.15e\n", test[i], testout[i]);
+      maxdif = fmax(fabs(test[i]-testout[i]),maxdif);
+      maxreldif = fmax(fabs((test[i]-testout[i])/test[i]),maxreldif);
+  }
+  printf("Maxdif: %.15e Maxreldif: %.15e\n",maxdif, maxreldif);
+
+}

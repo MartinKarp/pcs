@@ -12,10 +12,10 @@ pcs_struct *init_pcs_struct(){
 }
 
 int validate_pcs_struct(pcs_struct *opts){
-    int ierr = 0;
-    if (opts->oper == PCS_CPFLOAT){
-        ierr = cpfloat_validate_optstruct(opts->fpopts);
-    }
+   int ierr = 0;
+   if (opts->oper == PCS_CPFLOAT){
+      ierr = cpfloat_validate_optstruct(opts->fpopts);
+  }
     return ierr;
 }
 
@@ -25,6 +25,7 @@ int pcs(double *X, const double *A, const size_t n_el, pcs_struct *opts){
     operation_t op = opts->oper;
     int out;
     if (op == PCS_CPFLOAT){
+        printf("%d \n",opts->fpopts->precision);
         out = cpfloat(X,A,n_el,opts->fpopts);
     }
     else if (op == PCS_UNIFORM_NOISE){
