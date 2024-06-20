@@ -6,6 +6,14 @@ The idea is to provide a lightweight wrapper for different libraries and functio
 # Functionality
 The library revolves around the object `pcs_struct` which is initialized with the parameters one wants to modify and provides an in-place function `pcs` which carries out the transformation of the input vector.
 
-
+# Compile and clone
+```
+git clone --recurse-submodules git@github.com:MartinKarp/pcs.git
+```
+Set correct compilers in makefile and for cpfloat in external/cpfloat.
+```
+make cpfloat
+make
+```
 
 
