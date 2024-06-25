@@ -86,7 +86,7 @@ program example
     print *, 'Maxdif', maxdif,'Max rel dif', maxreldif
 
     !!Add uniform noise, set random seed
-    call pcg64_srandom(4_16, 1_16)
+    call pcg64_srandom(4_8, 1_8)
     options%oper = PCS_UNIFORM_NOISE
     options%arbitrary_amp = 0.1
     ierr = pcs(testout, test, N, options)

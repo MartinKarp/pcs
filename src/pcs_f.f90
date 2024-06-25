@@ -18,8 +18,8 @@ module pcg_f
 
   !same as pcg64_random_t
   type, public, bind(c) :: pcg_state_setseq_128
-     integer(c_int128_t) :: state
-     integer(c_int128_t) :: inc
+     integer(c_int64_t) :: state
+     integer(c_int64_t) :: inc
   end type
   interface
     integer(c_int32_t) function pcg32_random()&
@@ -46,8 +46,8 @@ module pcg_f
     subroutine pcg64_srandom(initstate, initseq)&
         bind(c, name="pcg64_srandom")
       use, intrinsic :: iso_c_binding
-      integer(c_int128_t), value :: initstate
-      integer(c_int128_t), value :: initseq
+      integer(c_int64_t), value :: initstate
+      integer(c_int64_t), value :: initseq
     end subroutine pcg64_srandom
   end interface
 end module pcg_f
