@@ -13,7 +13,23 @@ git clone --recurse-submodules git@github.com:MartinKarp/pcs.git
 Set correct compilers in makefile and for cpfloat in external/cpfloat.
 ```
 make cpfloat
-make
+export INSTALL_LOCATION=WHEREVER
+make PREFIX=${INSTALL_LOCATION}
 ```
+default prefix is pcs/install.
 
+After this using pcs should be a matter of adding  
 
+```
+-L${INSTALL_LOCATION}/lib -I${INSTALL_LOCATION}/include 
+```
+linking with
+
+```
+-lpcs_f -lpcs -lcpfloat -lpcg_random
+```
+and adding
+```
+${INSTALL_LOCATION}/lib 
+```
+to the LD\_LIBRARY\_PATH.
