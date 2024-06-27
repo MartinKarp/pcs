@@ -38,7 +38,7 @@ src/libpcs.a: src/pcs.o
 src/libpcs_f.a: src/pcs_f.o
 	ar -cr $@ $< 
 
-cpfloat: ${cpfloat_dir}/build/include/cpfloat.h
+cpfloat: 
 	cd ${cpfloat_dir} && make lib && cd ${root_dir}
 
 
