@@ -25,7 +25,7 @@ int pcs(double *X, const double *A, const size_t n_el, pcs_struct *opts){
     operation_t op = opts->oper;
     int out;
     if (op == PCS_CPFLOAT){
-        printf("%d \n",opts->fpopts->precision);
+        if (opts->fpopts->precision == 0) printf("Warning precision 0 in pcs/cpfloat \n");
         out = cpfloat(X,A,n_el,opts->fpopts);
     }
     else if (op == PCS_UNIFORM_NOISE){
