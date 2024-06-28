@@ -17,6 +17,8 @@ typedef struct {
 
 //init
 pcs_struct *init_pcs_struct();
+//free
+int free_pcs_struct(pcs_struct *opts);
 //validate
 int validate_pcs_struct(pcs_struct *opts);
 //Use same interface as CPFloat

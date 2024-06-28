@@ -11,6 +11,13 @@ pcs_struct *init_pcs_struct(){
     return opts;
 }
 
+int free_pcs_struct(pcs_struct *opts){
+   int ierr = 0;
+   ierr = free_optstruct(opts->fpopts);
+   free(opts);
+   return ierr;
+}
+
 int validate_pcs_struct(pcs_struct *opts){
    int ierr = 0;
    if (opts->oper == PCS_CPFLOAT){
