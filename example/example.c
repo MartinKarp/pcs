@@ -93,5 +93,8 @@ int main () {
       maxreldif = fmax(fabs((test[i]-testout[i])/test[i]),maxreldif);
   }
   printf("Maxdif: %.15e Maxreldif: %.15e\n",maxdif, maxreldif);
+  free_pcs_struct(opts);
+  free(test);
+  free(testout);
 
 }
