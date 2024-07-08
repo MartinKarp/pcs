@@ -15,18 +15,38 @@ int main () {
       double j = (double)i + 1.0;
       test[i] = (j*0.2)*(j*0.2) +j*1.32;
   }
+
+
   double maxdif = 0.0;
   double maxreldif = 0.0;
   // Validate the parameters in opts.
+
+  int retval = validate_pcs_struct(opts);
+  printf("The validation function returned %d.\n", retval);
+  printf("Sanity check, round to FP32 with RTN\n");
+  printf("Max rel dif < %.15e \n", pow(2.0,-1.0*opts->fpopts->precision));
+
+  retval = pcs(testout, test, N, opts);
+
+  for (size_t i = 0; i< N; i++){
+      printf("In: %.15e Out: %.15e\n", test[i], testout[i]);
+      maxdif = fmax(fabs(test[i]-testout[i]),maxdif);
+      maxreldif = fmax(fabs((test[i]-testout[i])/test[i]),maxreldif);
+  }
+
+  printf("Should be 0. Maxdif: %.15e Maxreldif: %.15e\n",maxdif, maxreldif);
+
   opts->oper = PCS_ARBITRARY_ROUND;
   opts->arbitrary_amp = 0.1;
-  int retval = validate_pcs_struct(opts);
+  retval = validate_pcs_struct(opts);
   printf("The validation function returned %d.\n", retval);
   printf("Round to arbitrary fixxed precision");
   printf("Round to closest %.15e Max dif < %.15e \n", opts->arbitrary_amp, opts->arbitrary_amp/2.0);
 
   retval = pcs(testout, test, N, opts);
 
+  maxdif = 0.0;
+  maxreldif = 0.0;
   for (size_t i = 0; i< N; i++){
       printf("In: %.15e Out: %.15e\n", test[i], testout[i]);
       maxdif = fmax(fabs(test[i]-testout[i]),maxdif);

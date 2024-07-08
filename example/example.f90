@@ -100,5 +100,8 @@ program example
        maxreldif = max(maxreldif,abs((test(i)-testout(i))/test(i)))
     end do
     print *, 'Maxdif', maxdif,'Max rel dif', maxreldif
+    deallocate(test)
+    deallocate(testout)
+    
 
 end program example

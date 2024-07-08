@@ -3,11 +3,25 @@
 #include "pcg_variants.h"
 #include "pcs.h"
 
-
+//Set standard arguments to single precision
 pcs_struct *init_pcs_struct(){
     pcs_struct *opts = malloc(sizeof(*opts));
     opts->fpopts = init_optstruct();
     opts->oper = PCS_CPFLOAT;
+    opts->fpopts->precision = 24;
+    opts->fpopts->emax = 127;
+    opts->fpopts->emin = -126;
+    opts->fpopts->round = CPFLOAT_RND_NE;
+    opts->fpopts->bitseed = NULL;
+    opts->fpopts->randseedf = NULL;
+    opts->fpopts->randseed= NULL;
+    strcpy(opts->fpopts->format, "");
+    opts->fpopts->p = 0.0;
+    opts->fpopts->infinity = 0;
+    opts->fpopts->flip=CPFLOAT_SOFTERR_NO;
+    opts->fpopts->subnormal=CPFLOAT_SUBN_USE;
+    opts->fpopts->explim = CPFLOAT_EXPRANGE_TARG;
+    opts->fpopts->saturation=CPFLOAT_SAT_NO;
     return opts;
 }
 
@@ -30,7 +44,7 @@ int validate_pcs_struct(pcs_struct *opts){
 
 int pcs(double *X, const double *A, const size_t n_el, pcs_struct *opts){
     operation_t op = opts->oper;
-    int out;
+    int out = 0;
     if (op == PCS_CPFLOAT){
         if (opts->fpopts->precision == 0) printf("Warning precision 0 in pcs/cpfloat \n");
         out = cpfloat(X,A,n_el,opts->fpopts);
