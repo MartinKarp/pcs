@@ -1,3 +1,6 @@
+#if !defined(PCS_H)
+#define PCS_H
+
 #include "cpfloat.h"
 #include "pcg_variants.h"
 
@@ -24,3 +27,4 @@ int validate_pcs_struct(pcs_struct *opts);
 //Use same interface as CPFloat
 int pcs(double *X, const double *A, const size_t n_el, pcs_struct *opts);
 
+#endif
